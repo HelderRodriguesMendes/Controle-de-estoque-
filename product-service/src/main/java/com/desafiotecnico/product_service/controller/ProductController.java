@@ -9,10 +9,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -25,5 +24,21 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> save(@Valid @RequestBody ProductRequestDTO productRequestDTO) {
         Product productSaved = productService.save(ConvertEntityAndDTO.convertDtoToEntity(productRequestDTO));
         return new ResponseEntity<>(ConvertEntityAndDTO.convertEntityToDto(productSaved), HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> listAll() {
+        List<Product> products = productService.findAll();
+        return ResponseEntity.ok(
+            products.stream()
+                .map(ConvertEntityAndDTO::convertEntityToDto)
+                .toList()
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> findById(@PathVariable Long id) {
+        Product product = productService.findById(id);
+        return ResponseEntity.ok(ConvertEntityAndDTO.convertEntityToDto(product));
     }
 }
