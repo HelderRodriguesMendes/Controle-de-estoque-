@@ -6,6 +6,9 @@ import com.desafiotecnico.product_service.entity.Product;
 
 public class ConvertEntityAndDTO {
 
+    private ConvertEntityAndDTO() {
+    }
+
     public static Product convertDtoToEntity(ProductRequestDTO productRequestDTO) {
         return Product.builder()
             .id(productRequestDTO.getId())

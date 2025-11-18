@@ -26,6 +26,12 @@ public class ProductController {
         return new ResponseEntity<>(ConvertEntityAndDTO.convertEntityToDto(productSaved), HttpStatus.CREATED);
     }
 
+    @GetMapping(params = "name")
+    public ResponseEntity<List<Product>> findByName(@RequestParam String name) {
+        List<Product> products = productService.findByName(name);
+        return ResponseEntity.ok(products);
+    }
+
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> listAll() {
         List<Product> products = productService.findAll();

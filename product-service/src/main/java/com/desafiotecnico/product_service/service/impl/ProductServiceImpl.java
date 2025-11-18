@@ -29,17 +29,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findByName(String name) {
+    public List<Product> findByName(String name) {
         log.info("starting find product by name: {}", name);
-        Optional<Product> productOptional = productRepository.findByName(name);
-        if (!productOptional.isPresent()) {
+        Optional<List<Product>> optionalProductList = productRepository.findByName(name);
+        if (!optionalProductList.isPresent()) {
             log.info("product not found: {}", name);
             throw new NotFoundException(
                 MessageException.PRODUCT_NOT_FOUND.getMensagem()
                     + name, HttpStatus.NOT_FOUND
             );
         }
-        return productOptional.get();
+        return optionalProductList.get();
     }
 
     @Override
