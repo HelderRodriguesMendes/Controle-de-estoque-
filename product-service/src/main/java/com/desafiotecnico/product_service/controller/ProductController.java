@@ -47,4 +47,16 @@ public class ProductController {
         Product product = productService.findById(id);
         return ResponseEntity.ok(ConvertEntityAndDTO.convertEntityToDto(product));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ProductRequestDTO productRequestDTO) {
+        Product updatedProduct = productService.update(id, ConvertEntityAndDTO.convertDtoToEntity(productRequestDTO));
+        return ResponseEntity.ok(ConvertEntityAndDTO.convertEntityToDto(updatedProduct));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteById(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
