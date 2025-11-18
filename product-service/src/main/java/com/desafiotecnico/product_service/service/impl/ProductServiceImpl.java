@@ -1,40 +1,82 @@
 package com.desafiotecnico.product_service.service.impl;
 
 import com.desafiotecnico.product_service.entity.Product;
+import com.desafiotecnico.product_service.enums.MessageException;
+import com.desafiotecnico.product_service.exception.NotFoundException;
+import com.desafiotecnico.product_service.repository.ProductRepository;
 import com.desafiotecnico.product_service.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements ProductService {
+
+    private final ProductRepository productRepository;
+
     @Override
     public Product save(Product product) {
-        return null;
+        log.info("starting save product: {}", product);
+        Product savedProduct = productRepository.save(product);
+        log.info("product saved successfully: {}", savedProduct);
+        return savedProduct;
     }
 
     @Override
     public Product findByName(String name) {
-        return null;
+        log.info("starting find product by name: {}", name);
+        Optional<Product> productOptional = productRepository.findByName(name);
+        if (!productOptional.isPresent()) {
+            log.info("product not found: {}", name);
+            throw new NotFoundException(
+                MessageException.PRODUCT_NOT_FOUND.getMensagem()
+                    + name, HttpStatus.NOT_FOUND
+            );
+        }
+        return productOptional.get();
     }
 
     @Override
     public List<Product> findAll() {
-        return List.of();
+        return productRepository.findAll();
     }
 
     @Override
     public Product findById(Long id) {
-        return null;
+        log.info("starting find product by id: {}", id);
+        Optional<Product> productOptional = productRepository.findById(id);
+        if(!productOptional.isPresent()) {
+            log.info("product not found: {}", id);
+            throw new NotFoundException(
+                MessageException.PRODUCT_NOT_FOUND.getMensagem()
+                    + id, HttpStatus.NOT_FOUND
+            );
+        }
+        log.info("product found: {}", productOptional.get());
+        return productOptional.get();
     }
 
     @Override
     public Product update(Long id, Product product) {
-        return null;
+        findById(id);
+        log.info("starting update product: {}", product);
+        product.setId(id);
+        Product updatedProduct = productRepository.save(product);
+        log.info("product updated successfully: {}", updatedProduct);
+        return updatedProduct;
     }
 
     @Override
     public void delete(Long id) {
-
+        findById(id);
+        log.info("starting delete product by id: {}", id);
+        productRepository.deleteById(id);
+        log.info("product deleted successfully: {}", id);
     }
 }
