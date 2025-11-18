@@ -19,7 +19,7 @@ public class ProductExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Nullable
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+    protected ResponseEntity handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         HttpHeaders headers,
         HttpStatusCode status,
