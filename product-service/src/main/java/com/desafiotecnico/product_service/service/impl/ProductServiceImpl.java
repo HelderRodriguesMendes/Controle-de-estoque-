@@ -1,10 +1,14 @@
 package com.desafiotecnico.product_service.service.impl;
 
+import com.desafiotecnico.product_service.dto.request.ProductSendMessageRequestDTO;
+import com.desafiotecnico.product_service.dto.response.ProductResponseDTO;
 import com.desafiotecnico.product_service.entity.Product;
 import com.desafiotecnico.product_service.enums.MessageException;
 import com.desafiotecnico.product_service.exception.NotFoundException;
+import com.desafiotecnico.product_service.message.KafkaProducerMessage;
 import com.desafiotecnico.product_service.repository.ProductRepository;
 import com.desafiotecnico.product_service.service.ProductService;
+import com.desafiotecnico.product_service.utils.ConvertEntityAndDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +23,8 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+
+    private final KafkaProducerMessage kafkaProducerMessage;
 
     @Override
     public Product save(Product product) {
@@ -44,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAll() {
+        log.info("starting find all products");
         return productRepository.findAll();
     }
 
@@ -64,10 +71,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product update(Long id, Product product) {
-        findById(id);
+        Product productSaved = findById(id);
         log.info("starting update product: {}", product);
         product.setId(id);
         Product updatedProduct = productRepository.save(product);
+        log.info("Starting send message to kafka for product update: {}", updatedProduct);
+        kafkaProducerMessage.sendMessageUpdate(new ProductSendMessageRequestDTO(updatedProduct.getId()));
         log.info("product updated successfully: {}", updatedProduct);
         return updatedProduct;
     }
@@ -79,4 +88,5 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(id);
         log.info("product deleted successfully: {}", id);
     }
+
 }
